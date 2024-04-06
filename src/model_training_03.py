@@ -1,23 +1,15 @@
-
-
-from sklearn.linear_model import SGDClassifier,LogisticRegression
-from sklearn.ensemble import RandomForestClassifier,GradientBoostingClassifier,AdaBoostClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import BaggingClassifier
-from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
-from sklearn.svm import SVC
-from sklearn.model_selection import cross_val_predict, cross_val_score,KFold, RepeatedStratifiedKFold
-from sklearn.model_selection import GridSearchCV
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, BaggingClassifier, AdaBoostClassifier
-from sklearn.metrics import accuracy_score
-import pickle
-import os 
+import os
+import joblib
 import pandas as pd
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
+from sklearn.metrics import accuracy_score
 
 class Model_Training:
     def __init__(self):
         self.best_model = None
+        self.best_model_accuracy = 0.0
         self.scoring = 'accuracy'
 
     def training(self):
@@ -44,17 +36,19 @@ class Model_Training:
                 y_pred_proba = best_model.predict_proba(x_test)[:, 1]
                 accuracy = accuracy_score(y_test, y_pred_proba.round())
 
-                if self.best_model is None or accuracy > self.best_model[2]:
-                    self.best_model = (name, best_model, accuracy)
+                print(f"{name} - Best Parameters: {grid_search.best_params_}, Best Accuracy: {accuracy}")
 
-            best_model_path = os.path.join(artifacts_path, 'best_model.pkl')
-            with open(best_model_path, 'wb') as f:
-                pickle.dump(self.best_model, f)
+                if accuracy > self.best_model_accuracy:
+                    self.best_model = best_model
+                    self.best_model_accuracy = accuracy
+
+            best_model_path = os.path.join(artifacts_path, 'best_model.joblib')
+            joblib.dump(self.best_model, best_model_path)
 
         except Exception as e:
-            raise
+            raise e
 
-# Instantiate and train the Model_Training object
+# Example usage:
 if __name__ == "__main__":
-    obj = Model_Training()
-    obj.training()
+    model_trainer = Model_Training()
+    model_trainer.training()
