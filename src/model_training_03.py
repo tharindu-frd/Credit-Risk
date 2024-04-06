@@ -17,10 +17,8 @@ import pandas as pd
 
 class Model_Training:
     def __init__(self):
-        self.best_models = []
-        self.best_params = []
+        self.best_model = None
         self.scoring = 'accuracy'
-        self.best_model = None 
 
     def training(self):
         try:
@@ -32,27 +30,22 @@ class Model_Training:
             y_train = pd.read_csv(os.path.join(artifacts_path, 'y_train.csv'))
             y_test = pd.read_csv(os.path.join(artifacts_path, 'y_test.csv'))
             y_train = y_train.values.ravel()
+
             models = [
                 ('RF', RandomForestClassifier(), {'n_estimators': [10, 50, 100, 200]}),
-                #('SVC', SVC(), {'C': [0.1, 1, 10], 'kernel': ['linear', 'rbf']}),
                 ('xgboost', XGBClassifier(), {'n_estimators': [50, 100, 150], 'learning_rate': [0.01, 0.1, 0.2]}),
-                #('lightgbm', LGBMClassifier(), {'n_estimators': [50, 100, 150], 'learning_rate': [0.01, 0.1, 0.2]}),
-               
             ]
 
             for name, model, param_grid in models:
                 grid_search = GridSearchCV(model, param_grid, cv=5, scoring=self.scoring)
                 grid_search.fit(x_train, y_train)
                 best_model = grid_search.best_estimator_
-                best_param = grid_search.best_params_
-                self.best_models.append((name, best_model))
-                self.best_params.append((name, best_param))
 
-            for name, model in self.best_models:
-                y_pred_proba = model.predict_proba(x_test)[:, 1]
+                y_pred_proba = best_model.predict_proba(x_test)[:, 1]
                 accuracy = accuracy_score(y_test, y_pred_proba.round())
-                if self.best_model is None or accuracy > self.best_model[1]:
-                    self.best_model = (model, accuracy)
+
+                if self.best_model is None or accuracy > self.best_model[2]:
+                    self.best_model = (name, best_model, accuracy)
 
             best_model_path = os.path.join(artifacts_path, 'best_model.pkl')
             with open(best_model_path, 'wb') as f:
@@ -61,9 +54,7 @@ class Model_Training:
         except Exception as e:
             raise
 
-
-
+# Instantiate and train the Model_Training object
 if __name__ == "__main__":
-     obj = Model_Training()
-     obj.training()
-    
+    obj = Model_Training()
+    obj.training()
