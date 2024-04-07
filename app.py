@@ -2,6 +2,8 @@ import os
 import pickle
 from flask import Flask, request, jsonify
 import numpy as np 
+import joblib
+
 
 def create_app():
     app = Flask(__name__)
@@ -23,7 +25,7 @@ def create_app():
 
         # Load the model
         with open(model_path, 'rb') as f:
-            model = pickle.load(f)
+            model = joblib.load(f)
 
         # Extract features from the JSON data
         features = {
@@ -82,6 +84,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
    "job": 3,
    "people_liable": 2,
    "telephone": 1,
-   "foreign_worker": 2
-}' http://localhost:5000/predict
+   "foreign_worker":0
+}' http://abec3b96b8be84976aaedb932992dd67-630967548.eu-north-1.elb.amazonaws.com:5000/predict
+
 '''
