@@ -96,3 +96,8 @@ kubectl get services -o wide
 ```
 eksctl delete clustr tharindu-cluster-6
 ```
+
+## ref link
+```
+https://www.youtube.com/watch?v=wyad99QMKtc&t=485s
+```
