@@ -85,6 +85,6 @@ curl -X POST -H "Content-Type: application/json" -d '{
    "people_liable": 2,
    "telephone": 1,
    "foreign_worker":0
-}' http://abec3b96b8be84976aaedb932992dd67-630967548.eu-north-1.elb.amazonaws.com:5000/predict
+}' http://abec3b96b8be84976aaedb932992dd67-630967548.eu-north-1.elb.amazonaws.com/predict
 
 '''
